@@ -17,6 +17,77 @@ The `--margin N` option will change the default horizontal margin (1) to whateve
 The `--left-margin N` option will change the default left margin (1) to whatever N you enter. This will take precedent over the `--margin` option for the left margin.
 The `--right-margin N` option will change the default right margin (1) to whatever N you enter. This will take precedent over the `--margin` option for the right margin.
 
+## Examples
+
+```
+% for f in sample/*; do; <$f bin/embox; done
+┌────────────────┐
+│ a medium title │
+│ with a very    │
+│ specific width │
+│ of a body      │
+└────────────────┘
+┌────────────────────────┐
+│ short title            │
+│ with a much wider body │
+│ to test this situation │
+└────────────────────────┘
+┌────────────────────┐
+│ quite a long title │
+│ with a             │
+│ narrow             │
+│ body               │
+└────────────────────┘
+```
+
+```
+% for f in sample/*; do; <$f bin/embox --title; done
+┌────────────────┐
+│ a medium title │
+├────────────────┤
+│ with a very    │
+│ specific width │
+│ of a body      │
+└────────────────┘
+┌─────────────┐
+│ short title │
+├─────────────┴──────────┐
+│ with a much wider body │
+│ to test this situation │
+└────────────────────────┘
+┌────────────────────┐
+│ quite a long title │
+├────────┬───────────┘
+│ with a │
+│ narrow │
+│ body   │
+└────────┘
+```
+
+```
+% for f in sample/*; do; <$f bin/embox --title --margin 5; done
+┌────────────────────────┐
+│     a medium title     │
+├────────────────────────┤
+│     with a very        │
+│     specific width     │
+│     of a body          │
+└────────────────────────┘
+┌─────────────────────┐
+│     short title     │
+├─────────────────────┴──────────┐
+│     with a much wider body     │
+│     to test this situation     │
+└────────────────────────────────┘
+┌────────────────────────────┐
+│     quite a long title     │
+├────────────────┬───────────┘
+│     with a     │
+│     narrow     │
+│     body       │
+└────────────────┘
+```
+
 ## Contributors
 
 - [Will Lewis](https://github.com/your-github-user) - creator and maintainer
