@@ -1,0 +1,4 @@
+a medium title
+with a very
+specific width
+of a body
