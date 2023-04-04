@@ -66,6 +66,13 @@ class Embox
   property left_margin_over : Int32?
   property right_margin_over : Int32?
 
+  # the space betwen the arrow's point and the text
+  property arrow_margin = 1
+
+  # the number of horizontal-only characters of the arrow
+  # (the arrow also has a 90deg and a triangle character)
+  property arrow_length = 2
+
   def left_margin
     left_margin_over || margin
   end
@@ -179,6 +186,62 @@ class Embox
     puts
   end
 
+  def main_fancy_arrow
+    input = STDIN.gets_to_end.lines
+
+    max_width = input.max_by(&.size).size
+
+    print box(Set{Side::South, Side::East})
+    print box(Side.horizontal) * left_margin
+    print box(Side.vertical)
+    print box(Side.horizontal) * (max_width + 1 + arrow_length + arrow_margin)
+    print box(Side.horizontal) * right_margin
+    print box(Set{Side::South, Side::West})
+    puts
+
+    input.each_with_index do |line, index|
+      extra = max_width - line.size
+
+      print box(Side.vertical)
+
+      print space * left_margin
+      if index == 0
+        print box(Set{Side::North, Side::East})
+        print box(Side.horizontal) * arrow_length
+        print "►"
+        print space * (arrow_margin)
+      else
+        print space * (2 + arrow_length + arrow_margin)
+      end
+      print line
+      print space * extra
+      print space * right_margin
+      print box(Side.vertical)
+      puts
+    end
+
+    print box(Set{Side::North, Side::East})
+    print box(Side.horizontal) * left_margin
+    print box(Side.horizontal) * (max_width + 2 + arrow_length + arrow_margin)
+    print box(Side.horizontal) * right_margin
+    print box(Set{Side::North, Side::West})
+    puts
+  end
+
+  def parse_positive_int(name, &block)
+    subarg = ARGV.shift
+    if i = subarg.to_i?
+      if i >= 0
+        debputs "setting #{name} to #{i}"
+        yield i
+      else
+        errputs "#{name} cannot be less than 0"
+      end
+    else
+      errputs "#{name} argument must be an integer"
+    end
+  end
+
   def parse_cli
     main_variation = :simple
 
@@ -186,54 +249,31 @@ class Embox
       case arg = ARGV.shift
       when "--title"
         main_variation = :title
+      when "--fancy-arrow"
+        main_variation = :fancy_arrow
       when "--debug"
         @debug = true
         debputs "setting debug to true"
       when "--margin"
-        subarg = ARGV.shift
-        if i = subarg.to_i?
-          if i >= 0
-            debputs "setting margin to #{i}"
-            @margin = i
-          else
-            errputs "margin cannot be less than 0"
-          end
-        else
-          errputs "'#{subarg}' must be an integer"
-        end
+        parse_positive_int("margin") { |i| @margin = i }
+      when "--arrow-margin"
+        parse_positive_int("arrow-margin") { |i| @arrow_margin = i }
+      when "--arrow-length"
+        parse_positive_int("arrow-length") { |i| @arrow_length = i }
       when "--left-margin"
-        subarg = ARGV.shift
-        if i = subarg.to_i?
-          if i >= 0
-            debputs "setting left-margin to #{i}"
-            @left_margin_over = i
-          else
-            errputs "left-margin cannot be less than 0"
-          end
-        else
-          errputs "left-margin argument must be an integer"
-        end
+        parse_positive_int("left-margin") { |i| @left_margin_over = i }
       when "--right-margin"
-        subarg = ARGV.shift
-        if i = subarg.to_i?
-          if i >= 0
-            debputs "setting right-margin to #{i}"
-            @right_margin_over = i
-          else
-            errputs "right-margin cannot be less than 0"
-          end
-        else
-          errputs "right-margin argument must be an integer"
-        end
+        parse_positive_int("right-margin") { |i| @right_margin_over = i }
       else
         errputs "unknown option: '#{arg}'. ignoring."
       end
     end
 
     case main_variation
-    when :simple then main_simple
-    when :title  then main_title
-    else              do_help
+    when :simple      then main_simple
+    when :title       then main_title
+    when :fancy_arrow then main_fancy_arrow
+    else                   do_help
     end
   end
 
